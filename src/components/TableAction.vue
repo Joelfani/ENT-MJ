@@ -4,7 +4,7 @@
 
     <a v-if="userStore.edit && modalcompte" data-toggle="modal" :data-target="'#mod' + id" class="btn btn-primary"> Modifier </a>
 
-    <a v-if="userStore.delet" data-toggle="modal" :data-target="'#sup' + id" class="btn btn-danger">Supprimer</a>
+    <a v-if="userStore.delet && view_but_del" data-toggle="modal" :data-target="'#sup' + id" class="btn btn-danger">Supprimer</a>
 
     <!-- Modal for editing -->
     <ModalComponent v-if="!modalcompte" :id="'mod' + id" :title="'Modifier ' + title">
@@ -59,6 +59,10 @@ props: {
     modalcompte: {
     type: Boolean,
     default: false,
+    },
+    view_but_del: {
+        type: Boolean,
+        default: true,
     },
 },
 components: {

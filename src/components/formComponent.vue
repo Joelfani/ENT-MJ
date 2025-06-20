@@ -4,7 +4,7 @@
         <div v-for="input in inputs" :key="input.id">
             <label :for="input.id"><span v-if="input.required" style="color: red;">*</span> {{ input.label}}</label>
             <input
-            v-if="input.type === 'text' || input.type === 'email' || input.type === 'password' || input.type === 'number' ||  input.type === 'date'"
+            v-if="input.type === 'text' || input.type === 'email' || input.type === 'password' ||  input.type === 'date'"
             :type="input.type"
             class="form-control"
             :id="input.id"
@@ -24,7 +24,18 @@
                     {{ option.text }}
                 </option>
             </select>
-
+            <input
+                v-if="input.type === 'number'"
+                type="number"
+                class="form-control"
+                :id="input.id"
+                v-model="formData[input.id]"
+                :placeholder="input.placeholder ?? ''"
+                :disabled="input.disabled ?? false"
+                :required="input.required ?? false"
+                :min="input.min ?? 0"
+                :max="input.max ?? Infinity"
+            />
             <textarea
                 v-if="input.type === 'textarea'"
                 class="form-control"

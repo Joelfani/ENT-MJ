@@ -1,9 +1,24 @@
 <template>
     <LoadingComponent v-if="isLoading" dataload="des candidats" />
     <div v-else>
-        <button class="btn btn-dark btn-table btn-lg" id="tool" data-toggle="tooltip" data-placement="left" :title="tool" @click="dev_tab()">{{ label_but_dev_tab }}</button>
-        <a v-if="userStore.add" class="btn btn-success btn-lg" data-toggle="modal" data-target="#add_candidat"> Ajouter </a>
-        <button class="btn btn-light btn-lg" @click="exportToExcel">Exporter vers Excel</button>
+        <div class="header-title-table">
+            <div class="">
+                <button class="btn btn-dark btn-table btn-lg" id="tool" data-toggle="tooltip" data-placement="left" :title="tool" @click="dev_tab()">{{ label_but_dev_tab }}</button>
+                <a v-if="userStore.add" class="btn btn-success btn-lg" data-toggle="modal" data-target="#add_candidat"> Ajouter </a>
+                <button class="btn btn-light btn-lg" @click="exportToExcel">Exporter vers Excel</button>
+            </div>
+            <SearchInput 
+            :rech="texteRecherche"
+            :choix_rech="critereRecherche"
+            :options="options"
+            @update:rech="texteRecherche = $event" 
+            @update:choix_rech="critereRecherche = $event"
+            @search="filtrer"
+            />
+            <!-- "texteRecherche = $event" = Je prends la valeur envoyée (dans $event) et je la stocke dans texteRecherche -->
+        </div>
+        
+        
         <TableComponent :columns="label_but_dev_tab === 'Développer' ? columns2 : columns" :rows="candidats">
             <template #actions="{ item }">
                 <TableAction :id="item.id" title="le candidat" table-suppr="infoc" tableEdit="infoc" @mod_data="dataInitialFormMod">
@@ -32,6 +47,7 @@ import { supabase } from '@/supabase';
 import { mapStores } from 'pinia';
 import { selectPromStore } from '@/store/selectProm';
 import * as XLSX from "xlsx";
+import SearchInput from '@/components/SearchInput.vue';
 
 export default {
     name: 'CandidatEleve',
@@ -41,11 +57,20 @@ export default {
         TableAction,
         FormComponent,
         ModalComponent,
+        SearchInput,
     },
     data() {
         return {
 
             isLoading: true,
+            texteRecherche: '',
+            critereRecherche: 'nom',
+            rech: '',
+            data_before_search: [],
+            options: [
+                { value: 'nom', label: 'Nom et Prénom' },
+                { value: 'filiere', label: 'Filière' },
+            ],
             candidats: [],
             columns: [
                     { key: 'nom', label: "Nom et Prénom", style: 'min-width: 250px' , etat:true},
@@ -239,8 +264,9 @@ export default {
             handler() {
                 this.getCandidats();
             },
-            immediate: true,
+            immediate: true,// Le handler est exécuté directement lorsque le composant est monté
         },
+
     },
     methods: {
         async getCandidats() {
@@ -255,13 +281,52 @@ export default {
                 
                 this.candidats = data;
 
-                
+                this.data_before_search = data; // Stocker les données avant la recherche
                 this.isLoading = false;
             } catch (error) {
                 console.error('Erreur lors de la récupération des candidats:', error);
                 this.candidats = [];
                 this.isLoading = false;
             }
+        },
+        async filtrer() {   
+                if (this.critereRecherche === 'nom') {
+                    try {
+                    const { data, error } = await supabase
+                    .from('infoc')
+                    .select('*')
+                    .eq('prom', this.selectPromStore.promotionCan_selected)
+                    .ilike(this.critereRecherche, `%${this.texteRecherche}%`)
+                    .order('id', { ascending: false });
+                    if (error) throw error;
+                    this.candidats = data;
+                    
+                    }catch (error) {
+                        console.error('Erreur lors de la recherche des candidats:', error);
+                        this.candidats = [];
+                    }
+                }
+                else {
+                    if (this.texteRecherche === '') {
+                        this.candidats = this.data_before_search;
+                        return;
+                    }else{
+                        try {
+                        const { data, error } = await supabase
+                        .from('infoc')
+                        .select('*')
+                        .eq('prom', this.selectPromStore.promotionCan_selected)
+                        .eq(this.critereRecherche, `${this.texteRecherche.toUpperCase()}`)
+                        .order('id', { ascending: false });
+                        if (error) throw error;
+                        this.candidats = data;
+                        }catch (error) {
+                            console.error('Erreur lors de la recherche des candidats:', error);
+                            this.candidats = [];
+                        }
+                    }
+                    
+                }
         },
         dev_tab() {
             if (this.label_but_dev_tab === 'Développer') {
