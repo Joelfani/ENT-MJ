@@ -15,6 +15,7 @@
                 @search="filtrer"
             />
         </div>
+        
         <TableComponent :columns="columns" :rows="absences">
             <template #actions="{ item }">
                 <TableAction :id="item.id" title="l'absence" table-suppr="abs" tableEdit="abs" @mod_data="dataInitialFormMod">
@@ -93,6 +94,7 @@ export default {
                 { value: 'Retard', text: 'Retard' },
             ],
             absences: [],
+            abs_sub: [],
         };
     },
     computed: {
