@@ -15,7 +15,6 @@
                 @search="filtrer"
             />
         </div>
-        
         <TableComponent :columns="columns" :rows="absences">
             <template #actions="{ item }">
                 <TableAction :id="item.id" title="l'absence" table-suppr="abs" tableEdit="abs" @mod_data="dataInitialFormMod">
@@ -81,7 +80,6 @@ export default {
                 { value: 'nom', label: 'Nom et Prénom' },
                 { value: 'ctg', label: 'Catégorie' },
             ],
-            absences: [],
             columns: [
                 { key: 'nom', label: 'Nom et Prénom', style: 'min-width: 250px', etat: true },
                 { key: 'nb_absences', label: 'Nombre d\'absences', style: 'min-width: 150px' },
@@ -94,6 +92,7 @@ export default {
                 { value: 'Absence', text: 'Absence' },
                 { value: 'Retard', text: 'Retard' },
             ],
+            absences: [],
         };
     },
     computed: {
@@ -128,18 +127,31 @@ export default {
             ];
         },
     },
+    watch: {
+        abs_sub: {
+            deep: true,
+            handler() {
+                this.debouncedGetAbsences();
+            }
+        }
+    },
     methods: {
-        async getAbsences() {
+        async getfirstAbsence(){
             this.isLoading = true;
+            await this.getAbsences();
+        },
+        async getAbsences() {
             try {
                 // Fetch all absence records
                 const { data, error } = await supabase
                     .from('abs')
                     .select('id, nom, ctg, mesure')
                     .order('nom', { ascending: true });
+
+                    this.abs_sub = data;
                 if (error) throw error;
 
-                // Aggregate data by nom
+                // Aggregate data by nom => Aggregate = regrouper les données
                 const aggregatedData = [];
                 const uniqueNames = [...new Set(data.map(item => item.nom))]; //  Ici on crée un tableau contenant chaque nom une seule fois.
 
@@ -163,7 +175,7 @@ export default {
             } catch (error) {
                 console.error('Erreur lors de la récupération des absences:', error);
                 this.absences = [];
-                this.isLoading = false;
+                this.isLoading = false; 
             }
         },
         debouncedGetAbsences: debounce(function () {
@@ -276,7 +288,7 @@ export default {
             }
         },
         subscribeToTable() {
-            this.realtimeStore.subscribeToTable('abs', 'absences', this);
+            this.realtimeStore.subscribeToTable('abs', 'abs_sub', this);
         },
         exportToExcel() {
             const worksheetData = this.absences.map(item => {
@@ -299,10 +311,10 @@ export default {
     },
     async mounted() {
         this.subscribeToTable();
-        await this.getAbsences();
+        await this.getfirstAbsence();
     },
     beforeUnmount() {
-        this.realtimeStore.unsubscribeFromTable('abs', 'absences');
+        this.realtimeStore.unsubscribeFromTable('abs', 'abs_sub');
     },
 };
 </script>
