@@ -330,13 +330,24 @@ export default {
             this.realtimeStore.subscribeToTable('abs', 'abs_sub', this);
         },
         exportToExcel() {
-            const worksheetData = this.absences.map(item => {
+            let worksheetData = [];
+            if( this.label_but_dev_tab === 'Développer') {
+                worksheetData = this.absences.map(item => {
+                const row = {};
+                this.columns2.forEach(col => {
+                    row[col.label] = item[col.key] || '';
+                });
+                return row;
+            });
+            }else{
+                worksheetData = this.absences_all.map(item => {
                 const row = {};
                 this.columns.forEach(col => {
                     row[col.label] = item[col.key] || '';
                 });
                 return row;
             });
+            }
             const ws = XLSX.utils.json_to_sheet(worksheetData);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Absences');
