@@ -74,7 +74,12 @@ export default {
             type: String,
             default: 'btn btn-primary'
         },
+        parent: {
+            type: Boolean,
+            default: false
+        },
     },
+    emits: ['submit', 'dataform'],
     data() {
     return {
         formData: {}
@@ -91,11 +96,19 @@ export default {
         })
         this.formData = formdata
         }
+    },
+
+    formData: {
+        deep: true,
+        handler(newData) {
+            if (this.parent) {
+                this.$emit('dataform', newData);
+            }
+        }
     }
     },
     methods: {
 
     },
-    emits: ['submit']
 }
 </script>

@@ -6,6 +6,7 @@
                     <section class="common_section">
                         <div class="text-center">
                             <h3 class="section_name">{{ title }}</h3>
+                            <p v-if = "mini_title" class="section_name" style="font-size: 1rem;">{{ mini_title }}</p>
                         </div>
                         <hr />
                         <div class="info">
@@ -29,6 +30,10 @@ export default {
         title: {
             type: String,
             required: true
+        },
+        mini_title: {
+            type: String,
+            default: ''
         }
     }
 }

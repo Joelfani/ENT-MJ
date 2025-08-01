@@ -1,13 +1,20 @@
 <template>
 <div style="text-align: center;">
+
+    <!-- Button neutre -->
+    <a v-if="neutre_but" data-toggle="modal" :data-target="'#' + btn_neutre_modal + id" :class="'btn ' + btn_neutre_class" @click="$emit('btn_neutre_click')"> {{ label_neutre_but }} </a>
+    
+    <!-- Button for editing -->
     <a v-if="userStore.edit && !modalcompte && view_but_mod" data-toggle="modal" :data-target="'#mod' + id" class="btn btn-primary" @click="recovery_data"> Modifier </a>
 
+    <!-- Button for account management -->
     <a v-if="userStore.edit && modalcompte" data-toggle="modal" :data-target="'#mod' + id" class="btn btn-primary"> Modifier </a>
 
+    <!-- Button for deletion -->
     <a v-if="userStore.delet && view_but_del" data-toggle="modal" :data-target="'#sup' + id" class="btn btn-danger">Supprimer</a>
 
     <!-- Modal for editing -->
-    <ModalComponent v-if="!modalcompte" :id="'mod' + id" :title="'Modifier ' + title">
+    <ModalComponent v-if="!modalcompte" :id="'mod' + id" :title="'Modifier ' + title" :mini_title="mini_title">
         <slot name="form_modifier"></slot>
     </ModalComponent>
 
@@ -25,6 +32,9 @@
 
     <!-- Modal for account management -->
     <EditUser v-if="modalcompte" :id="id"/>
+
+    <!--Modal for neutre button -->
+    
 </div>
 
 
@@ -72,6 +82,26 @@ props: {
     notSuppr: {
         type: Boolean,
         default: false,
+    },
+    neutre_but: {
+        type: Boolean,
+        default: false,
+    },
+    label_neutre_but: {
+        type: String,
+        default: 'Neutre',
+    },
+    btn_neutre_class: {
+        type: String,
+        default: 'btn-light',
+    },
+    btn_neutre_modal: {
+        type: String,
+        default: 'neutre',
+    },
+    mini_title: {
+        type: String,
+        default: '',
     },
 },
 components: {
