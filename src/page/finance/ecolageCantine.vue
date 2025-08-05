@@ -18,7 +18,7 @@
         {{ initialCtg }}
         <TableComponent :columns="label_but_dev_tab === 'Développer' ? columns2 : columns" :rows="filteredRows">
             <template #actions="{ item }">
-                <TableAction :id="item.id" title="ou enregistrer un paiement" table-suppr="payment" :notSuppr="true" :view_but_mod="false" :neutre_but="true" label_neutre_but="Modifier" btn_neutre_class="btn-primary" btn_neutre_modal="mod" @btn_neutre_click="dataInitialFormMod(initialCtg,initialAnnee,initialMois,item.id)" @loadData="loadData" @mod_data="dataInitialFormMod"  :mini_title="item.nom">
+                <TableAction :id="item.id" title="ou enregistrer un paiement" table-suppr="payment" :notSuppr="true" :view_but_mod="false" :neutre_but="true" label_neutre_but="Modifier" btn_neutre_class="btn-primary" btn_neutre_modal="mod" @btn_neutre_click="dataInitialFormMod(initialCtg,initialAnnee,initialMois,item.id)" @loadData="loadData"  :mini_title="item.nom">
                     <template #form_modifier>
                         <FormComponent :inputs="input_mod" label_button="Modifier / Enregistrer" @submit="modPaiement" :parent="true" @dataform="dataformMod"/>
                     </template>
@@ -213,19 +213,22 @@ export default {
             try{
                 const { data, error } = await supabase
                 .from('payment')
-                .select('montant')
+                .select('*')
                 .eq('ele_id', id)
                 .eq('categorie', ctg)
                 .eq('annee', annee)
                 .eq('mois', mois)
                 .single();
+                this.initialMontant = data ? data.montant : '';
                 if (error) throw error;
-                this.initialMontant = data;
+                
             } catch (error) {
-                console.log('voici l/id',id);
-                console.log('Voici l/ctg',ctg);
-                console.log('Voici l/annee',annee);
-                console.log('Voici l/mois',mois);
+                console.log('voici l id',id);
+                console.log('Voici l ctg',ctg);
+                console.log('Voici l annee',annee);
+                console.log('Voici l mois',mois);
+                console.log('le montant initial',this.initialMontant);
+                
                 
                 console.error('Erreur lors de la modification du paiement:', error);
                 alert('Erreur lors de la modification du paiement.');
