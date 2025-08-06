@@ -18,9 +18,37 @@
         {{ initialCtg }}
         <TableComponent :columns="label_but_dev_tab === 'Développer' ? columns2 : columns" :rows="filteredRows">
             <template #actions="{ item }">
-                <TableAction :id="item.id" title="ou enregistrer un paiement" table-suppr="payment" :notSuppr="true" :view_but_mod="false" :neutre_but="true" label_neutre_but="Modifier" btn_neutre_class="btn-primary" btn_neutre_modal="mod" @btn_neutre_click="dataInitialFormMod(initialCtg,initialAnnee,initialMois,item.id)" @loadData="loadData"  :mini_title="item.nom">
-                    <template #form_modifier>
-                        <FormComponent :inputs="input_mod" label_button="Modifier / Enregistrer" @submit="modPaiement" :parent="true" @dataform="dataformMod"/>
+                <TableAction :id="item.id" title="ou enregistrer un paiement" table-suppr="payment" :notSuppr="true" :view_but_mod="false" :neutre_but="true" label_neutre_but="Modifier" btn_neutre_class="btn-primary" btn_neutre_modal="mod" @btn_neutre_click="dataInitialFormMod(ctg,annee,mois,item.id)" @loadData="loadData"  :mini_title="item.nom" :view_but_del="false">
+                    <template #form_modifier >
+                        <form class="form" @submit.prevent="handleSubmit">
+                            <div class="form-group">
+                                <label for="montant">Categories</label>
+                                <select class="form-control" name="categorie" v-model="ctg">
+                                    <option value="ecolage">Écolage</option>
+                                    <option value="cantine">Cantine</option>
+                                </select>
+                                <label for="annee">Année</label>
+                                <input type="number" class="form-control" name="annee" min="1" max="2" v-model="annee">
+                                <label for="mois">Mois</label>
+                                <select class="form-control" name="mois" v-model="mois">
+                                    <option value="janvier">Janvier</option>
+                                    <option value="fevrier">Fevrier</option>
+                                    <option value="mars">Mars</option>
+                                    <option value="avril">Avril</option>
+                                    <option value="mai">Mai</option>
+                                    <option value="juin">Juin</option>
+                                    <option value="juillet">Juillet</option>
+                                    <option value="aout">Aout</option>
+                                    <option value="septembre">Septembre</option>
+                                    <option value="octobre">Octobre</option>
+                                    <option value="novembre">Novembre</option>
+                                    <option value="decembre">Décembre</option>
+                                </select>
+                                <label for="montant">Montant</label>
+                                <input type="number" class="form-control" name="montant">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        </form>
                     </template>
                 </TableAction>
             </template>
@@ -29,7 +57,6 @@
 </template>
 
 <script>
-import FormComponent from '@/components/formComponent.vue';
 import LoadingComponent from '@/components/loadingComponent.vue';
 import TableAction from '@/components/TableAction.vue';
 import TableComponent from '@/components/TableComponent.vue';
@@ -48,7 +75,6 @@ export default {
         TableComponent,
         LoadingComponent,
         TableAction,
-        FormComponent,
         SearchInput,
     },
     data() {
@@ -81,10 +107,9 @@ export default {
             tool: 'Développer le tableau',
             initialValues: {},
             initialId: null,
-            initialCtg: 'ecolage',
-            initialAnnee: 1,
-            initialMois: 'janvier',
-            initialMontant: null,
+            ctg: 'ecolage',
+            annee: 1,
+            montant: null,
 
             test: null,
         };
@@ -234,10 +259,6 @@ export default {
                 alert('Erreur lors de la modification du paiement.');
             }
             
-        },
-        dataformMod(data) {
-            const datas = data;
-            this.dataInitialFormMod(datas.categorie, datas.annee, datas.mois, this.initialId);
         },
         async modPaiement(data) {
             try {

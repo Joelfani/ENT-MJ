@@ -97,15 +97,6 @@ export default {
         this.formData = formdata
         }
     },
-
-    formData: {
-        deep: true,
-        handler(newData) {
-            if (this.parent) {
-                this.$emit('dataform', newData);
-            }
-        }
-    }
     },
     methods: {
 

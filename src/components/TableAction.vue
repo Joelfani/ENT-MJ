@@ -51,7 +51,7 @@ import { supabase } from '@/supabase';
 
 export default {
 name: 'TableAction',
-emits: ['mod_data'],
+emits: ['mod_data', 'btn_neutre_click'],
 props: {
     id: {
     type: [String, Number],
