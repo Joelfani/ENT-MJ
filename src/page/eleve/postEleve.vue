@@ -164,8 +164,8 @@ export default {
         'selectPromStore.promotion_selected': {
             handler() {
                 this.debouncedGetPostFormations();
+                console.log('je suis dans wachter');
             },
-            immediate: true,
         },
     },
     methods: {
@@ -174,6 +174,8 @@ export default {
             await this.getPostFormations();
         },
         async getPostFormations() {
+            console.log('getPostFormations called');
+            
             try {
                 const { data, error } = await supabase
                     .from('infoc')
@@ -283,6 +285,7 @@ export default {
     async mounted() {
         this.subscribeToTable();
         await this.getFiliere();
+        this.debouncedGetPostFormations();
     },
     beforeUnmount() {
         this.realtimeStore.unsubscribeFromTable('infoc', 'postFormations');

@@ -15,12 +15,11 @@
                 @search="filtrer"
             />
         </div>
-        {{ initialCtg }}
         <TableComponent :columns="label_but_dev_tab === 'Développer' ? columns2 : columns" :rows="filteredRows">
             <template #actions="{ item }">
-                <TableAction :id="item.id" title="ou enregistrer un paiement" table-suppr="payment" :notSuppr="true" :view_but_mod="false" :neutre_but="true" label_neutre_but="Modifier" btn_neutre_class="btn-primary" btn_neutre_modal="mod" @btn_neutre_click="dataInitialFormMod(ctg,annee,mois,item.id)" @loadData="loadData"  :mini_title="item.nom" :view_but_del="false">
+                <TableAction :id="item.id" title="ou enregistrer un paiement" table-suppr="payment" :notSuppr="true" :view_but_mod="false" :neutre_but="true" label_neutre_but="Modifier" btn_neutre_class="btn-primary" btn_neutre_modal="mod" @btn_neutre_click="dataInitialFormMod(ctg,annee,moisMod,item.id)" @loadData="loadData"  :mini_title="item.nom" :view_but_del="false">
                     <template #form_modifier >
-                        <form class="form" @submit.prevent="handleSubmit">
+                        <form class="form" @submit.prevent="ModPaiement({ ele_id: item.id, categorie: ctg, annee: annee, mois: moisMod, montant: montant })">
                             <div class="form-group">
                                 <label for="montant">Categories</label>
                                 <select class="form-control" name="categorie" v-model="ctg">
@@ -30,7 +29,7 @@
                                 <label for="annee">Année</label>
                                 <input type="number" class="form-control" name="annee" min="1" max="2" v-model="annee">
                                 <label for="mois">Mois</label>
-                                <select class="form-control" name="mois" v-model="mois">
+                                <select class="form-control" name="mois" v-model="moisMod">
                                     <option value="janvier">Janvier</option>
                                     <option value="fevrier">Fevrier</option>
                                     <option value="mars">Mars</option>
@@ -45,9 +44,9 @@
                                     <option value="decembre">Décembre</option>
                                 </select>
                                 <label for="montant">Montant</label>
-                                <input type="number" class="form-control" name="montant">
+                                <input type="number" class="form-control" name="montant" v-model="montant">
                             </div>
-                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                            <button type="submit" class="btn btn-primary">Enregistrer / Modifier</button>
                         </form>
                     </template>
                 </TableAction>
@@ -106,50 +105,47 @@ export default {
             label_but_dev_tab: 'Développer',
             tool: 'Développer le tableau',
             initialValues: {},
-            initialId: null,
+            idMod: null,
             ctg: 'ecolage',
             annee: 1,
             montant: null,
-
-            test: null,
+            moisMod: 'fevrier',
         };
     },
     computed: {
         ...mapStores(useUserStore, useSubscribeStore, selectPromStore),
         filteredRows() {
             return this.eleves.map(eleve => {
+                console.log(eleve.id);
                 const row = { id: eleve.id, rang: eleve.rang, nom: eleve.nom, filiere: eleve.filiere };
                 this.categories.forEach(cat => {
                     this.mois.forEach(moisItem => {
                         const key = `${cat.key}_${cat.annee}_${moisItem}`;
                         row[key] = this.getPaiement(eleve.id, cat.key, cat.annee, moisItem);
-                    });
+                    });                    
                 });
                 return row;
             });
-        },
-        input_mod() {
-            return [
-                { id: 'categorie', type: 'select', label: 'Catégorie', initialValue: this.initialCtg, options: [
-                    { value: 'ecolage', text: 'Écolage' },
-                    { value: 'cantine', text: 'Cantine' },
-                ], required: true },
-                { id: 'annee', type: 'number', label: 'Année d\'étude', initialValue: this.initialAnnee, min: 1, max: 2, required: true },
-                { id: 'mois', type: 'select', label: 'Mois', initialValue: this.initialMois , options: this.mois.map(m => ({ value: m, text: m.charAt(0).toUpperCase() + m.slice(1) })), required: true },
-                { id: 'montant', type: 'number', label: 'Montant', initialValue: this.initialMontant, required: true },
-            ];
         },
     },
     watch: {
         'selectPromStore.promotion_selected': {
             handler() {
-                this.debouncedFetchData();
+                this.debouncedecoData();                
             },
-            immediate: true,
+        },
+        ctg() {
+            this.dataInitialFormMod(this.ctg, this.annee, this.moisMod, this.idMod);
+        },
+        annee() {
+            this.dataInitialFormMod(this.ctg, this.annee, this.moisMod, this.idMod);
+        },
+        moisMod() {
+            this.dataInitialFormMod(this.ctg, this.annee, this.moisMod, this.idMod);
         },
     },
     methods: {
-        async fetchData() {
+        async ecoData() {
             this.isLoading = true;
             try {
                 const { data: eleves, error: elevesError } = await supabase
@@ -175,8 +171,8 @@ export default {
                 this.isLoading = false;
             }
         },
-        debouncedFetchData: debounce(function () {
-            this.fetchData();
+        debouncedecoData: debounce(function () {
+            this.ecoData();
         }, 300),
         updateColumns() {
             const dynamicColumns = this.categories.flatMap(cat => 
@@ -184,6 +180,7 @@ export default {
                     key: `${cat.key}_${cat.annee}_${moisItem}`,
                     label: `${cat.label} ${moisItem.charAt(0).toUpperCase() + moisItem.slice(1)}`,
                     style: 'min-width: 200px; text-align: center',
+
                 }))
             );
             this.columns = [
@@ -195,16 +192,16 @@ export default {
         },
         getPaiement(eleveId, cat, annee, mois) {
             const p = this.paiements.find(pay => 
-                pay.eleve_id === eleveId && 
+                pay.ele_id === eleveId && 
                 pay.categorie === cat && 
-                pay.annee_etude === annee && 
+                pay.annee === annee && 
                 pay.mois === mois
             );
             return p ? p.montant : '';
         },
         async filtrer() {
             if (this.texteRecherche === '') {
-                this.fetchData();
+                this.ecoData();
                 return;
             }
             try {
@@ -234,31 +231,27 @@ export default {
             this.tool = this.label_but_dev_tab === 'Développer' ? 'Développer le tableau' : 'Réduire le tableau';
         },
         async dataInitialFormMod(ctg, annee, mois, id) {
-            this.initialId = id;
-            try{
-                const { data, error } = await supabase
-                .from('payment')
-                .select('*')
-                .eq('ele_id', id)
-                .eq('categorie', ctg)
-                .eq('annee', annee)
-                .eq('mois', mois)
-                .single();
-                this.initialMontant = data ? data.montant : '';
-                if (error) throw error;
-                
-            } catch (error) {
-                console.log('voici l id',id);
-                console.log('Voici l ctg',ctg);
-                console.log('Voici l annee',annee);
-                console.log('Voici l mois',mois);
-                console.log('le montant initial',this.initialMontant);
-                
-                
-                console.error('Erreur lors de la modification du paiement:', error);
-                alert('Erreur lors de la modification du paiement.');
+            this.idMod = id;
+            if(annee === 1 || annee === 2) {
+                try{
+                    const { data, error } = await supabase
+                    .from('payment')
+                    .select('*')
+                    .eq('ele_id', id)
+                    .eq('categorie', ctg)
+                    .eq('annee', annee)
+                    .eq('mois', mois)
+                    .maybeSingle();
+                    this.montant = data ? data.montant : 0;
+                    if (error) throw error;
+                } 
+                catch (error) {
+                    if (error.details !== 'The result contains 0 rows') {
+                        console.error('Erreur lors de la modification du paiement:', error);
+                        alert('Erreur lors de la modification du paiement.');
+                    }
+                }
             }
-            
         },
         async modPaiement(data) {
             try {
@@ -269,7 +262,7 @@ export default {
                 if (error) throw error;
                 
                 alert('Paiement modifié avec succès !');
-                this.fetchData();
+                this.ecoData();
             } catch (error) {
                 console.error('Erreur lors de la modification du paiement:', error);
                 alert('Erreur lors de la modification du paiement.');
@@ -292,12 +285,12 @@ export default {
             XLSX.writeFile(wb, 'Paiements.xlsx');
         },
         loadData() {
-            this.fetchData();
+            this.ecoData();
         },
     },
     async mounted() {
         this.subscribeToTable();
-        await this.fetchData();
+        await this.debouncedecoData();
     },
     beforeUnmount() {
         this.realtimeStore.unsubscribeFromTable('payment', 'paiements');
