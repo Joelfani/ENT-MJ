@@ -164,7 +164,6 @@ export default {
         'selectPromStore.promotion_selected': {
             handler() {
                 this.debouncedGetPostFormations();
-                console.log('je suis dans wachter');
             },
         },
     },
@@ -174,7 +173,6 @@ export default {
             await this.getPostFormations();
         },
         async getPostFormations() {
-            console.log('getPostFormations called');
             
             try {
                 const { data, error } = await supabase

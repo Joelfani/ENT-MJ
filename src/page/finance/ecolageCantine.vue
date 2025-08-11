@@ -46,7 +46,7 @@
                                     <option value="decembre">Décembre</option>
                                 </select>
                                 <label for="montant">Montant</label>
-                                <input type="number" class="form-control" name="montant" v-model="montant" required>
+                                <input type="number" class="form-control" name="montant" v-model="montant">
                             </div>
                             <button type="submit" class="btn btn-primary">Enregistrer / Modifier</button>
                             <button class="btn btn-light" data-dismiss="modal">Fermer</button>
@@ -263,9 +263,23 @@ export default {
                 try {
                     const { error } = await supabase
                         .from('payment')
-                        .update({ montant: this.montant })
+                        .update({ montant: this.montant == '' ? null : this.montant})
                         .eq('id', this.idPay);
                     if (error) throw error;
+                    try {
+                        const {error} = await supabase
+                        .from('pay_track')
+                        .insert({
+                            id_pay: this.idPay,
+                            ele_id: this.idMod,
+                            descriptif: this.ctg,
+                            montant: this.montant == '' ? null : this.montant,
+                            user: this.userStore.id
+                        })
+                        if (error) throw error;
+                    } catch (error) {
+                        console.error('Erreur lors de la récupération des données après modification:', error);
+                    }
                     alert('Paiement modifié avec succès !');
                 } catch (error) {
                     console.error('Erreur lors de la modification du paiement:', error);
@@ -273,16 +287,29 @@ export default {
                 }
             }else {
                 try {
-                    const { error } = await supabase
+                    const {data, error } = await supabase
                         .from('payment')
                         .insert({
                             ele_id: this.idMod,
                             categorie: this.ctg,
                             annee: this.annee,
                             mois: this.moisMod,
-                            montant: this.montant,
-                        });
+                            montant: this.montant == '' ? null : this.montant ,
+                        })
+                        .select('id')
+                        .single();
                     if (error) throw error;
+                    this.idPay = data.id;
+                    await supabase
+                        .from('pay_track')
+                        .insert({
+                            id_pay: this.idPay,
+                            ele_id: this.idMod,
+                            descriptif: this.ctg,
+                            montant: this.montant == '' ? null : this.montant,
+                            user: this.userStore.id
+                        });
+
                     alert('Paiement enregistré avec succès !');
                     this.dataInitialFormMod(this.ctg, this.annee, this.moisMod, this.idMod);
                 } catch (error) {
