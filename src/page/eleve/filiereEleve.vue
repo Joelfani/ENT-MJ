@@ -77,7 +77,6 @@ export default {
                 .from('filiere')
                 .select('*')
                 .order('id', { ascending: false });
-                console.log('Filieres:', data);
                 if (error) throw error;
                 
                 
@@ -94,7 +93,6 @@ export default {
                 .from('filiere')
                 .select('*')
                 .or(`nom.eq.${data.nom},nomlong.eq.${data.nomlong}`)
-                console.log('Données à DOUBLE:', doubleData);
             if (doubleData.data.length > 0) {
                 alert('Le nom ou l/abréviation entree existe déjà.');
                 return;

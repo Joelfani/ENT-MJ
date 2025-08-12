@@ -295,7 +295,6 @@ export default {
                 .not('rang', 'is', null)
                 .order('rang', { ascending: false })
                 .limit(1);
-                console.log('Récupération du matricule:', data);
                 
                 // Si aucun enregistrement n'existe encore
                 const maxRang = data.length > 0 ? data[0].rang : 0;
@@ -351,8 +350,6 @@ export default {
                 .from('promotion')
                 .select('*')
                 .eq('id', data.prom);
-                console.log('data input:', data.prom);
-                console.log('recupname:', recupname[0]?.name);
                 
             if (error) {
                 console.error('Erreur lors de la récupération de la promotion:', error);

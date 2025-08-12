@@ -108,8 +108,6 @@ export default {
     } else {
         this.categories = data.filter(category => category.id !== 1);
     }
-
-    console.log(this.categories);
     
     },
     async send_register() {
@@ -147,7 +145,6 @@ export default {
         } 
         catch (error) {
         console.error('Error adding user:', error)
-        console.log('Code erreur:', error.code);
         
         if (error.code === 'weak_password') {
             alert('Le mot de passe doit contenir au moins 6 caractères !')
@@ -180,7 +177,6 @@ export default {
     }
     },
     async mounted() {
-    console.log('etat de l application:'+ navigator.onLine);
     setInterval(async () => {
         if (!navigator.onLine) {
         alert('Vous êtes hors ligne! Veuillez vous connecter à internet et rafraichir la page')

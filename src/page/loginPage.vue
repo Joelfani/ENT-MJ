@@ -92,8 +92,6 @@ export default {
     } else {
       this.categories = data 
     }
-
-    console.log(data);
     
   },
   async send_connexion() {
@@ -141,7 +139,6 @@ export default {
 
             // Connexion réussie
 
-            console.log("Connecté avec succès :"); 
             this.erreur = ""; // efface les messages d’erreur
             const userStore = useUserStore()
 
@@ -171,7 +168,6 @@ export default {
 
   },
   async mounted() {
-    console.log('etat de l application:'+ navigator.onLine);
     setInterval(async () => {
         if (!navigator.onLine) {
         alert('Vous êtes hors ligne! Veuillez vous connecter à internet et rafraichir la page')

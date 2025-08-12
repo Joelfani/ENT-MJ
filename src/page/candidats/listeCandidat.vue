@@ -393,8 +393,7 @@ export default {
             const doubleData = await supabase
                 .from('infoc')
                 .select('*')
-                .eq('nom', data.nom)
-            console.log('Données à DOUBLE:', doubleData);            
+                .eq('nom', data.nom)     
             if (doubleData.data.length > 0) {
                 alert('Un candidat avec ce nom existe déjà.');
                 return;
@@ -465,8 +464,6 @@ export default {
                 });
                 return row;
             });
-            console.log('Données pour Excel:', worksheetData);
-            
             const data = worksheetData;
             const ws = XLSX.utils.json_to_sheet(data);
             const wb = XLSX.utils.book_new();
