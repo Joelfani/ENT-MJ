@@ -44,8 +44,10 @@
                             <li v-for="subItem in menu.subItems" :key="subItem.title">
                                 <RouterLink
                                     v-if="!subItem.modal"
-                                    :to="'/HomePage/'+subItem.view"
+                                    :to="userStore[subItem.acces] ? '/HomePage/'+subItem.view: ''"
                                     class="myBox"
+                                    data-toggle="modal"
+                                    :data-target="userStore[subItem.acces] ? '': '#UNACCESS'"
                                     :class="{'selectedMenu': selected === subItem.view}"
                                     :title="subItem.title"
                                     @click="changeClass(subItem.view,subItem.title_view)"
@@ -59,11 +61,11 @@
                                     class="myBox"
                                     :class="{'selectedMenu': selected === subItem.view}"
                                     data-toggle="modal"
-                                    :data-target="'#'+subItem.modal"
+                                    :data-target="userStore[subItem.acces] ? '#'+subItem.modal : '#UNACCESS'"
                                     :title="subItem.title"
                                     @click="changeClass(subItem.view)">
                                     <div :class="`sub_box centre ${subItem.icon || menu.icon}`"></div>
-                                    {{ subItem.title }}
+                                    {{ subItem.title}}
                                 </a>
                     
 
@@ -113,7 +115,12 @@
                 </ModalComponent>
             </div>
         </div>
-        
+        <!-- Modal pour refus d'acces -->
+        <ModalComponent title="NOTIFICATION D'ACCES" id="UNACCESS">
+            <h3 style="font-weight: bold; color: red;">ACCES NON AUTORISER</h3>
+            <hr>
+            <button class="btn btn-danger" data-dismiss="modal">Fermer</button>
+        </ModalComponent>
 </template>
 <script>
 import { supabase } from '@/supabase';
@@ -122,6 +129,7 @@ import ModalComponent from '@/components/ModalComponent.vue';
 import { mapStores } from 'pinia';
 import { useSubscribeStore } from '@/store/realtime';
 import { selectPromStore } from '@/store/selectProm';
+import { useUserStore } from '@/store/user';
 export default{
     name:'NavBar_component',
     props: {
@@ -176,7 +184,8 @@ export default{
                             title_view: 'FRAIS FIXES',
                             view: 'frais',
                             modalOff: 'plus',
-                            icon: 'icon-finance-frais-fixe'
+                            icon: 'icon-finance-frais-fixe',
+                            acces:'fin'
                             },
                             {
                             title: 'Ecolages et cantines',
@@ -185,7 +194,8 @@ export default{
                             title_view: 'ECOLAGES ET CANTINES',
                             view: 'eco',
                             modalOff: 'plus',
-                            icon: 'icon-finance-ecolage'
+                            icon: 'icon-finance-ecolage',
+                            acces:'fin'
                             },
                             {
                             title: 'Suivi paiement',
@@ -193,7 +203,8 @@ export default{
                             title_view:'SUIVI DES PAIEMENTS',
                             view: 'suivi',
                             modalOff: 'plus',
-                            icon: 'icon-frais-suivi'
+                            icon: 'icon-frais-suivi',
+                            acces:'fin'
                             },
                         ],
                 },
@@ -208,7 +219,8 @@ export default{
                             title_view: 'INFORMATIONS GENERALES',
                             view: 'liste_eleve',
                             modalOff: 'plus',
-                            icon: 'icon-liste'
+                            icon: 'icon-liste',
+                            acces:'ele'
                             },
                             {
                             title: 'Absence et retard',
@@ -216,7 +228,8 @@ export default{
                             title_view:'ABSENCES ET RETARDS',
                             view: 'abs',
                             modalOff: 'plus',
-                            icon: 'icon-abs-rtd'
+                            icon: 'icon-abs-rtd',
+                            acces:'ele'
                             },
                             {
                             title: 'Stage',
@@ -225,7 +238,8 @@ export default{
                             title_view:'SUIVI DES STAGES',
                             view: 'stage',
                             modalOff: 'plus',
-                            icon: 'icon-stage'
+                            icon: 'icon-stage',
+                            acces:'ele'
                             },
                             {
                             title: 'Post formation',
@@ -234,7 +248,8 @@ export default{
                             title_view:'POST FORMATION DES ELEVES',
                             view: 'post',
                             modalOff: 'plus',
-                            icon: 'icon-post'
+                            icon: 'icon-post',
+                            acces:'ele'
                             },
                             {
                             title: 'Promotion',
@@ -242,7 +257,8 @@ export default{
                             title_view:'GESTION DES PROMOTIONS',
                             view: 'prom',
                             modalOff: 'plus',
-                            icon: 'icon-prom'
+                            icon: 'icon-prom',
+                            acces:'ele'
                             },
                             {
                             title: 'Filière',
@@ -250,7 +266,8 @@ export default{
                             title_view:'GESTION DES FILIERES',
                             view: 'fil',
                             modalOff: 'plus',
-                            icon: 'icon-filiere'
+                            icon: 'icon-filiere',
+                            acces:'ele'
                             },
                         ],
                 },
@@ -258,33 +275,36 @@ export default{
                         title: 'Candidats',
                         icon: 'icon-candidat',
                         subItems: [
-                        {
-                        title: 'Listes',
-                        modal: 'mdl-ask-candidat-liste',
-                        modal_title: 'LISTE DES CANDIDATS',
-                        title_view: 'LISTE DES CANDIDATS',
-                        view: 'can_list',
-                        modalOff: 'plus',
-                        isCandidate: true,
-                        icon: 'icon-liste'
-                        },
-                        {
-                        title: 'Note',
-                        modal: 'mdl-ask-candidat-note',
-                        modal_title: 'NOTE DES CANDIDATS',
-                        title_view: 'NOTE DES CANDIDATS',
-                        view: 'can_note',
-                        modalOff: 'plus',
-                        isCandidate: true,
-                        icon: 'icon-note'
-                        },
-                        {
-                        title: 'Année concours',
-                        view: 'can_annee',
-                        title_view: 'GESTION DES ANNÉES DE CONCOURS',
-                        isCandidate: true,
-                        icon: 'icon-annee'
-                        },
+                            {
+                            title: 'Listes',
+                            modal: 'mdl-ask-candidat-liste',
+                            modal_title: 'LISTE DES CANDIDATS',
+                            title_view: 'LISTE DES CANDIDATS',
+                            view: 'can_list',
+                            modalOff: 'plus',
+                            isCandidate: true,
+                            icon: 'icon-liste',
+                            acces:'can'
+                            },
+                            {
+                            title: 'Note',
+                            modal: 'mdl-ask-candidat-note',
+                            modal_title: 'NOTE DES CANDIDATS',
+                            title_view: 'NOTE DES CANDIDATS',
+                            view: 'can_note',
+                            modalOff: 'plus',
+                            isCandidate: true,
+                            icon: 'icon-note',
+                            acces:'can'
+                            },
+                            {
+                            title: 'Année concours',
+                            view: 'can_annee',
+                            title_view: 'GESTION DES ANNÉES DE CONCOURS',
+                            isCandidate: true,
+                            icon: 'icon-annee',
+                            acces:'can'
+                            },
                         ],
                 },
                 {
@@ -306,7 +326,7 @@ export default{
         }
     },
     computed: {
-        ...mapStores(useSubscribeStore,selectPromStore),
+        ...mapStores(useUserStore,useSubscribeStore,selectPromStore),
     },
     methods: {
 
@@ -325,7 +345,7 @@ export default{
         },
         async logout(){
             await supabase.auth.signOut()
-            this.$router.push('/login')
+            this.$router.push('/')
         },
         selectProm(prom,promCan) {
             if(prom){

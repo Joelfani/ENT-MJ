@@ -1,5 +1,5 @@
     <template>
-        <!-- Si simple super administrateur -->
+        <!-- Si super administrateur -->
         <div v-if="userStore.role_id === 1">
             <div class="col-xs-3 rech">
                 <br>
@@ -11,7 +11,7 @@
                 :columns="colonnes"
                 >
                 <template #actions = "{item}">
-                    <TableAction :id="item.id" title="un utilisateur" table-suppr="users" :modalcompte='true'/>
+                    <TableAction :id="item.id" title="un utilisateur" :view_but_del="false" :modalcompte='true'/>
                 </template>
             </TableComponent>
         </div>
@@ -80,10 +80,7 @@
             <ModalComponent :id="'updateEmail'+userStore.id" title="Modifier votre email" >
                 <FormComponent :inputs="inputs_email" label_button="Modifier" @submit="updateEmail"/>
             </ModalComponent>
-
-
-
-
+            
     </template>
 <script>
 import FormComponent from '@/components/formComponent.vue';
@@ -91,6 +88,7 @@ import LoadingComponent from '@/components/loadingComponent.vue';
 import ModalComponent from '@/components/ModalComponent.vue';
 import TableAction from '@/components/TableAction.vue';
 import TableComponent from '@/components/TableComponent.vue';
+import { useSubscribeStore } from '@/store/realtime';
 import { useUserStore } from '@/store/user';
 
 import { supabase } from '@/supabase';
@@ -120,7 +118,8 @@ export default {
         colonnes: [
         { key: 'email', label: 'Email' },
         { key: 'name_user', label: 'Pseudo' },
-        { key: 'ctg_name', label: 'Role de l\'utilisateur' }
+        { key: 'ctg_name', label: 'Role de l\'utilisateur' },
+        { key: 'activer', label: 'Statut du compte' }
         ],
 
         domain_data:[
@@ -133,10 +132,19 @@ export default {
             { key: 'edit', label: 'Modifier' },
             { key: 'delet', label: 'Supprimer' },
         ],
+        subscribeData: [],
     }
     },
+    watch: {
+        subscribeData: {
+            handler() {
+            this.list_user();
+            },
+            deep: true 
+        }
+    },
     computed: {
-        ...mapStores(useUserStore),
+        ...mapStores(useUserStore,useSubscribeStore),
         inputs() {
             return [
                 { 
@@ -167,6 +175,7 @@ export default {
             const { data, error } = await supabase
                 .from('users')
                 .select('* , list_ctg (name_ctg) as name_ctg')
+                .order('activer', { ascending: false });
             if (error) {
                 console.error('Erreur chargement utilisateurs :', error.message)
             } else {
@@ -184,9 +193,9 @@ export default {
                 */
                 this.utilisateurs = data.map(u => ({
                         ...u,
-                        ctg_name: u.list_ctg?.name_ctg || 'Non défini'
+                        ctg_name: u.list_ctg?.name_ctg || 'Non défini',
+                        activer: u.activer ? 'Activé' : 'Désactivé'
                         }));
-
                 this.isloading = false
             }
             
@@ -226,11 +235,20 @@ export default {
                 console.error('Erreur inattendue :', err);
             }
         },
+
+        subscribeToTable() {
+            this.realtimeStore.subscribeToTable('users', 'subscribeData', this);
+            this.subscribeData = this.utilisateurs
+        },
     },
     async mounted() {
     if (this.userStore.role_id === 1) {
         await this.list_user();
+        this.subscribeToTable();
     }
+    },
+    beforeUnmount() {
+        this.realtimeStore.unsubscribeFromTable('users', 'subscribeData');
     },
 }
 </script>

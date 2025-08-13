@@ -38,67 +38,82 @@ const routes = [
         children:[
             {
                 path:'tdb_fin',
-                component:FinancePage
+                component:FinancePage,
+                meta: { requiresAuth: true, permission: 'fin' }
             },
             {
                 path:'tdb_ele',
-                component:EleveTdb
+                component:EleveTdb,
+                meta: { requiresAuth: true, permission: 'ele' }
             },
             {
                 path:'tdb_can',
-                component:CandidatTdb
+                component:CandidatTdb,
+                meta: { requiresAuth: true, permission: 'can' }
             },
             {
                 path:'frais',
-                component:FraisFixe
+                component:FraisFixe,
+                meta: { requiresAuth: true, permission: 'fin' }
             },
             {
                 path:'eco',
-                component:EcolageCantine
+                component:EcolageCantine,
+                meta: { requiresAuth: true, permission: 'fin' }
             },
             {
                 path:'suivi',
-                component:SuiviPage
+                component:SuiviPage,
+                meta: { requiresAuth: true, permission: 'fin' }
             },
             {
                 path:'liste_eleve',
-                component:ListeEleve
+                component:ListeEleve,
+                meta: { requiresAuth: true, permission: 'ele' }
             },
             {
                 path:'abs',
-                component:AbsenceEleve
+                component:AbsenceEleve,
+                meta: { requiresAuth: true, permission: 'ele' }
             },
             {
                 path:'stage',
-                component:StageEleve
+                component:StageEleve,
+                meta: { requiresAuth: true, permission: 'ele' }
             },
             {
                 path:'post',
-                component:PostEleve
+                component:PostEleve,
+                meta: { requiresAuth: true, permission: 'ele' }
             },
             {
                 path:'prom',
-                component:PromotionEleve
+                component:PromotionEleve,
+                meta: { requiresAuth: true, permission: 'ele' }
             },
             {
                 path:'fil',
-                component:FiliereEleve
+                component:FiliereEleve,
+                meta: { requiresAuth: true, permission: 'ele' }
             },
             {
                 path:'can_list',
-                component:ListeCandidat
+                component:ListeCandidat,
+                meta: { requiresAuth: true, permission: 'can' }
             },
             {
                 path:'can_note',
-                component:NoteCandidat
+                component:NoteCandidat,
+                meta: { requiresAuth: true, permission: 'can' }
             },
             {
                 path:'can_annee',
-                component:AnneeCandidat
+                component:AnneeCandidat,
+                meta: { requiresAuth: true, permission: 'can' }
             },
             {
                 path:'compte',
-                component:ComptePage
+                component:ComptePage,
             }
 
         ]
@@ -115,8 +130,11 @@ const router = createRouter({
 
 //router.beforeEach => code a executer avant chaque changement de route
 router.beforeEach(async (to, from, next) => {
+    // Vérifier si l'utilisateur est en ligne
+    // navigator.onLine => retourne true si l'utilisateur est en ligne, sinon false
     if (navigator.onLine) {
         const { data: { session },error } = await supabase.auth.getSession()
+        // si une erreur est survenue lors de la récupération de la session
         if(error)
         {
             if (to.name !== 'login' && to.name !== 'register') {
@@ -125,31 +143,38 @@ router.beforeEach(async (to, from, next) => {
                 next() // on laisse passer pour login et register
             }
         }
+        //si l'utilisateur n'est connecté
         else if (!session && to.name !== 'login' && to.name !== 'register') {
-        
-        
         // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
         next({ name:'login' })
         } 
         else {
-        //remplir le store user si il n'est pas rempli
-        const userStore = useUserStore()
-        if(!userStore.user){
-            //session?.user => Si session n'est pas null ni undefined, alors accède à session.user. Sinon, retourne undefined.
-            if (session?.user) {
-                const { data: userData } = await supabase
-                    .from('users')
-                    .select('*')
-                    .eq('id', session.user.id)
-                    .single()
+            //remplir le store user si il n'est pas rempli
+            const userStore = useUserStore()
+            if(!userStore.user){
+                //session?.user => Si session n'est pas null ni undefined, alors accède à session.user. Sinon, retourne undefined.
+                if (session?.user) {
+                    const { data: userData } = await supabase
+                        .from('users')
+                        .select('*')
+                        .eq('id', session.user.id)
+                        .single()
 
-                if (userData) {
-                    userStore.setUser(userData)
+                    if (userData) {
+                        userStore.setUser(userData)
+                    } 
                 }
             }
-        }
-        
-        next()
+            if(to.meta.requiresAuth) {
+                if (userStore[to.meta.permission]) {
+                    next() // L'utilisateur a la permission, on continue
+                }
+                else {
+                    next({ name: 'homePage' }) // L'utilisateur n'a pas la permission, on le redirige
+                }
+            }else{
+                next()
+            }
         }
     }
     else{

@@ -108,7 +108,7 @@ export default {
             // Vérifier la catégorie liée à l'email
             const { data: data_id_ctg, error: error_ctg } = await supabase
               .from('users')
-              .select('id_ctg')
+              .select('id_ctg,activer')
               .eq('email', this.email)
               .single();
 
@@ -119,6 +119,11 @@ export default {
 
             if (data_id_ctg.id_ctg !== this.ctg) {
               this.erreur = "Catégorie incorrecte pour cet utilisateur.";
+              return;
+            }
+
+            if (data_id_ctg.activer === false) {
+              this.erreur = "Votre compte n'est pas activé. Veuillez contacter l'administrateur.";
               return;
             }
 

@@ -23,6 +23,12 @@
                     <option value="3">Visiteur</option>
                     </select>
 
+                    <label for="ctg">STATUT DU COMPTE</label>
+                    <select class="form-control" v-model="form.activer">
+                    <option value="true">Activé</option>
+                    <option value="false">Désactivé</option>
+                    </select>
+
                     <label>DOMAINE</label>
                     <div class="row">
                     <div class="col col-sm-4">
@@ -112,7 +118,8 @@ export default {
                 can: this.form.can,
                 add: this.form.add,
                 edit: this.form.edit,
-                delet: this.form.delet
+                delet: this.form.delet,
+                activer: this.form.activer
                 })
                 .eq('id', this.id)
                 if (updateError) throw updateError  
