@@ -16,7 +16,7 @@
             />
         </div>
         
-        <TableComponent :columns="label_but_dev_tab === 'Développer' ? columns2 : columns" :rows="filteredRows">
+        <TableComponent :columns="label_but_dev_tab === 'Développer' ? columns2 : columns" :rows="filteredRows" :showActions="userStore.edit ? true : false">
             <template #actions="{ item }">
 
                 <TableAction :id="item.id" title="ou enregistrer un paiement" table-suppr="payment" :notSuppr="true" :view_but_mod="false" :neutre_but="true" label_neutre_but="Modifier" btn_neutre_class="btn-primary" btn_neutre_modal="mod" @btn_neutre_click="dataInitialFormMod(ctg,annee,moisMod,item.id)" @loadData="loadData"  :mini_title="item.nom" :view_but_del="false">

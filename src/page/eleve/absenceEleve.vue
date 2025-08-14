@@ -16,7 +16,7 @@
                 @search="filtrer"
             />
         </div>
-        <TableComponent :columns="label_but_dev_tab === 'Développer' ? columns2 : columns" :rows="label_but_dev_tab === 'Développer' ? absences : absences_all" :label_but_dev_tab="label_but_dev_tab" :tool="tool" :show-actions="label_but_dev_tab === 'Développer' ? false : true">
+        <TableComponent :columns="label_but_dev_tab === 'Développer' ? columns2 : columns" :rows="label_but_dev_tab === 'Développer' ? absences : absences_all" :label_but_dev_tab="label_but_dev_tab" :tool="tool" :show-actions="label_but_dev_tab !== 'Développer' && userStore.delet? true : false">
             <template #actions="{ item }">
                 <TableAction :id="item.id" title="l'absence" table-suppr="abs" :view_but_mod="false" :view_but_del="label_but_dev_tab === 'Développer' ? false : true" @mod_data="dataInitialFormMod">
                     <template #form_modifier>

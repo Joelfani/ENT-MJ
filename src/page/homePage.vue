@@ -57,6 +57,9 @@ export default {
                         alert('Vous êtes hors ligne! Veuillez vous connecter à internet et rafraichir la page')
                 }
                 },1000)
+
+                console.log('info user', this.userStore.edit);
+                
         }
 }
 </script>

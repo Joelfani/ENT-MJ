@@ -16,7 +16,7 @@
         />
         </div>
 
-        <TableComponent :columns="label_but_dev_tab === 'Développer' ? columns2 : columns" :rows="filteredRows">
+        <TableComponent :columns="label_but_dev_tab === 'Développer' ? columns2 : columns" :rows="filteredRows" :showActions="userStore.edit ? true : false">
         <template #actions="{ item }">
             <TableAction 
             :id="item.id" 
@@ -24,7 +24,7 @@
             table-suppr="payment" 
             :notSuppr="true" 
             :view_but_mod="false" 
-            :neutre_but="true" 
+            :neutre_but="userStore.edit ? true : false" 
             label_neutre_but="Modifier" 
             btn_neutre_class="btn-primary" 
             btn_neutre_modal="mod" 
