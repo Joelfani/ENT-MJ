@@ -117,7 +117,7 @@ export default {
         input_mod() {
             return [
         //{ id: 'id', type: 'hidden', initialValue: this.initialValues.id },
-        { id: 'rang', type: 'number', label: 'Matricule', placeholder: 'Entrez le matricule',initialValue: this.initialValues.rang},
+        { id: 'rang', type: 'number', label: 'Matricule', placeholder: 'Entrez le matricule',initialValue: this.initialValues.rang, disabled: true},
         { id: 'etat_ele', type: 'select', label: "Situation:", initialValue: this.initialValues.etat_ele, options: [
             { value: 'En cours', text: 'En cours' },
             { value: 'Diplômé', text: 'Diplômé' },
