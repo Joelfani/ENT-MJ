@@ -252,7 +252,7 @@ export default{
                             acces:'ele'
                             },
                             {
-                            title: 'Promotion',
+                            title: 'promotion',
                             action: 'open_promotion_eleve',
                             title_view:'GESTION DES PROMOTIONS',
                             view: 'prom',
@@ -359,7 +359,7 @@ export default{
         async getPromotions() {
             try {
                 const { data } = await supabase
-                .from('promotion')
+                .from('mjg_promotion')
                 .select('*')
                 .order('id', { ascending: false });
 

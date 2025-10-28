@@ -153,14 +153,14 @@ export default {
         async ecoData() {
             try {
                 const { data: eleves, error: elevesError } = await supabase
-                    .from('infoc')
+                    .from('mgj_infoc')
                     .select('*')
                     .eq('prom_ele', this.selectPromStore.promotion_selected)
                     .order('rang', { ascending: false });
                 if (elevesError) throw elevesError;
 
                 const { data: paiements, error: paiementsError } = await supabase
-                    .from('payment')
+                    .from('mjg_payment')
                     .select('*')
                     .order('id', { ascending: false });
                 if (paiementsError) throw paiementsError;
@@ -210,7 +210,7 @@ export default {
             }
             try {
                 const query = supabase
-                    .from('infoc')
+                    .from('mgj_infoc')
                     .select('*')
                     .eq('prom_ele', this.selectPromStore.promotion_selected)
                     .order('rang', { ascending: false });
@@ -239,7 +239,7 @@ export default {
             if(annee === 1 || annee === 2) {
                 try{
                     const { data, error } = await supabase
-                    .from('payment')
+                    .from('mjg_payment')
                     .select('*')
                     .eq('ele_id', id)
                     .eq('categorie', ctg)
@@ -262,7 +262,7 @@ export default {
             if (this.idPay) {
                 try {
                     const { error } = await supabase
-                        .from('payment')
+                        .from('mjg_payment')
                         .update({ montant: this.montant == '' ? null : this.montant})
                         .eq('id', this.idPay);
                     if (error) throw error;
@@ -288,7 +288,7 @@ export default {
             }else {
                 try {
                     const {data, error } = await supabase
-                        .from('payment')
+                        .from('mjg_payment')
                         .insert({
                             ele_id: this.idMod,
                             categorie: this.ctg,
@@ -319,7 +319,7 @@ export default {
             }
         },
         subscribeToTable() {
-            this.realtimeStore.subscribeToTable('payment', 'paiements', this);
+            this.realtimeStore.subscribeToTable('mjg_payment', 'paiements', this);
         },
         exportToExcel() {
             const worksheetData = this.filteredRows.map(item => {
@@ -343,7 +343,7 @@ export default {
         await this.debouncedecoData();
     },
     beforeUnmount() {
-        this.realtimeStore.unsubscribeFromTable('payment', 'paiements');
+        this.realtimeStore.unsubscribeFromTable('mjg_payment', 'paiements');
     },
 };
 </script>

@@ -21,7 +21,7 @@
         
         <TableComponent :columns="label_but_dev_tab === 'Développer' ? columns2 : columns" :rows="candidats">
             <template #actions="{ item }">
-                <TableAction :id="item.id" title="le candidat" table-suppr="infoc" tableEdit="infoc" @mod_data="dataInitialFormMod">
+                <TableAction :id="item.id" title="le candidat" table-suppr="mgj_infoc" tableEdit="mgj_infoc" @mod_data="dataInitialFormMod">
                     <template #form_modifier>
                         <FormComponent :inputs="input_mod" label_button="Modifier" @submit="modCandidat"/>
                     </template>
@@ -279,7 +279,7 @@ export default {
         async getCandidats() {
             try {
                 const { data, error } = await supabase
-                    .from('infoc')
+                    .from('mgj_infoc')
                     .select('*')
                     .eq('prom', this.selectPromStore.promotionCan_selected)
                     .order('id', { ascending: false });
@@ -301,7 +301,7 @@ export default {
                 if (this.critereRecherche === 'nom') {
                     try {
                     const { data, error } = await supabase
-                    .from('infoc')
+                    .from('mgj_infoc')
                     .select('*')
                     .eq('prom', this.selectPromStore.promotionCan_selected)
                     .ilike(this.critereRecherche, `%${this.texteRecherche}%`)
@@ -321,7 +321,7 @@ export default {
                     }else{
                         try {
                         const { data, error } = await supabase
-                        .from('infoc')
+                        .from('mgj_infoc')
                         .select('*')
                         .eq('prom', this.selectPromStore.promotionCan_selected)
                         .eq(this.critereRecherche, `${this.texteRecherche.toUpperCase()}`)
@@ -348,7 +348,7 @@ export default {
         async getFiliere() {
             try {
                 const { data, error } = await supabase
-                    .from('filiere')
+                    .from('mjg_filiere')
                     .select('*')
                     .order('id', { ascending: true });
                 if (error) throw error;
@@ -393,7 +393,7 @@ export default {
             },
         async addCandidat(data) {
             const doubleData = await supabase
-                .from('infoc')
+                .from('mgj_infoc')
                 .select('*')
                 .eq('nom', data.nom)     
             if (doubleData.data.length > 0) {
@@ -408,7 +408,7 @@ export default {
                         const age = today.getFullYear() - birthDate.getFullYear();
                         data.age = age;
                     }
-                    const { error } = await supabase.from('infoc').insert([data]);
+                    const { error } = await supabase.from('mgj_infoc').insert([data]);
                     if (error) {
                         throw error;
                     }
@@ -426,7 +426,7 @@ export default {
         },
         async modCandidat(data) {
             const doubleData = await supabase
-                .from('infoc')
+                .from('mgj_infoc')
                 .select('*')
                 .eq('nom', data.nom)
                 .neq('id', this.initialValues.id);
@@ -436,7 +436,7 @@ export default {
             } else {
                 try {
                     const { error } = await supabase
-                        .from('infoc')
+                        .from('mgj_infoc')
                         .update(data)
                         .eq('id', this.initialValues.id);
                     alert('Candidat modifié avec succès !');
@@ -450,7 +450,7 @@ export default {
         },
         // Méthode pour souscrire aux changements en temps réel
         subscribeToTable() {
-            this.realtimeStore.subscribeToTable('infoc', 'candidats', this);
+            this.realtimeStore.subscribeToTable('mgj_infoc', 'candidats', this);
         },
         exportToExcel() {
             // Map data to include only fields in columns
@@ -481,7 +481,7 @@ export default {
 
     beforeUnmount() {
         // Nettoyer la souscription
-        this.realtimeStore.unsubscribeFromTable('infoc', 'candidats');
+        this.realtimeStore.unsubscribeFromTable('mgj_infoc', 'candidats');
     },
 };
 </script>

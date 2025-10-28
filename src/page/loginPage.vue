@@ -110,6 +110,7 @@ export default {
               .from('users')
               .select('id_ctg,activer')
               .eq('email', this.email)
+              .eq('mjg', true)
               .single();
 
             if (error_ctg || !data_id_ctg) {
@@ -136,7 +137,11 @@ export default {
             if (authError) {
               if (authError.message === "Invalid login credentials") {
                 this.erreur = "Adresse e-mail ou mot de passe incorrect.";
-              } else {
+              } 
+              else if (authError.message === "Email not confirmed") {
+                this.erreur = "Veuillez confirmer votre adresse e-mail avant de vous connecter.";
+              }
+              else {
                 this.erreur = "Une erreur inattendue s'est produite. Veuillez réessayer.";
               }
               return;

@@ -18,7 +18,7 @@
         </div>
         <TableComponent :columns="label_but_dev_tab === 'Développer' ? columns2 : columns" :rows="label_but_dev_tab === 'Développer' ? absences : absences_all" :label_but_dev_tab="label_but_dev_tab" :tool="tool" :show-actions="label_but_dev_tab !== 'Développer' && userStore.delet? true : false">
             <template #actions="{ item }">
-                <TableAction :id="item.id" title="l'absence" table-suppr="abs" :view_but_mod="false" :view_but_del="label_but_dev_tab === 'Développer' ? false : true" @mod_data="dataInitialFormMod">
+                <TableAction :id="item.id" title="l'absence" table-suppr="mjg_abs" :view_but_mod="false" :view_but_del="label_but_dev_tab === 'Développer' ? false : true" @mod_data="dataInitialFormMod">
                     <template #form_modifier>
                         <FormComponent :inputs="input_mod" label_button="Modifier" @submit="modAbsence"/>
                     </template>
@@ -158,7 +158,7 @@ export default {
         async getAllDataAbsences() {
             try{
                 const { data, error } = await supabase
-                    .from('abs')
+                    .from('mjg_abs')
                     .select('*')
                     .order('id', { ascending: false });
 
@@ -174,7 +174,7 @@ export default {
         async getAbsences() {
             try {
                 const { data, error } = await supabase
-                    .from('abs')
+                    .from('mjg_abs')
                     .select('*')
                     .order('id', { ascending: false });
                 if (error) throw error;
@@ -222,7 +222,7 @@ export default {
             }
             try {
                 const { data, error } = await supabase
-                    .from('abs')
+                    .from('mjg_abs')
                     .select('*')
                     .ilike(this.critereRecherche, `%${this.texteRecherche}%`)
                     .order('id', { ascending: false });
@@ -272,7 +272,7 @@ export default {
             }
             try {
                 const { data, error } = await supabase
-                    .from('infoc')
+                    .from('mgj_infoc')
                     .select('id, nom, filiere, genre, prom_ele')
                     .eq('rang', this.add_matricule)
                     .single();
@@ -295,7 +295,7 @@ export default {
         },
         async addAbsence(data) {
             try {
-                const { error } = await supabase.from('abs').insert([data]);
+                const { error } = await supabase.from('mjg_abs').insert([data]);
                 if (error) throw error;
                 alert('Absence ajoutée avec succès !');
                 this.add_initialValue = this.getInitialForm();
@@ -311,7 +311,7 @@ export default {
         async modAbsence(data) {
             try {
                 const { error } = await supabase
-                    .from('abs')
+                    .from('mjg_abs')
                     .update(data)
                     .eq('id', this.initialValues.id);
                 if (error) throw error;
@@ -327,7 +327,7 @@ export default {
             this.tool = this.label_but_dev_tab === 'Développer' ? 'Développer le tableau' : 'Réduire le tableau';
         },
         subscribeToTable() {
-            this.realtimeStore.subscribeToTable('abs', 'abs_sub', this);
+            this.realtimeStore.subscribeToTable('mjg_abs', 'abs_sub', this);
         },
         exportToExcel() {
             let worksheetData = [];
@@ -361,7 +361,7 @@ export default {
         this.getAllDataAbsences();
     },
     beforeUnmount() {
-        this.realtimeStore.unsubscribeFromTable('abs', 'abs_sub');
+        this.realtimeStore.unsubscribeFromTable('mjg_abs', 'abs_sub');
     },
 };
 </script>

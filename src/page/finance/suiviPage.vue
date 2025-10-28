@@ -32,7 +32,7 @@
             title="le paiement" 
             :view_but_del="false" 
             :notSuppr="true" 
-            tableEdit="payment" 
+            tableEdit="mjg_payment" 
             @mod_data="dataInitialFormMod"
             >
             <template #form_modifier>
@@ -164,8 +164,8 @@
         async getSuiviPaiements() {
         try {
             const { data, error } = await supabase
-            .from('pay_track')
-            .select('id, time, montant, ele_id,descriptif, infoc!ele_id(nom),payment!id_pay(mois,annee),users!user(name_user)')
+            .from('mjg_pay_track')
+            .select('id, time, montant, ele_id,descriptif, mgj_infoc!ele_id(nom),mjg_payment!id_pay(mois,annee),users!user(name_user)')
             .order('time', { ascending: false })
             .order('id', { ascending: false })
             .limit(100);
@@ -173,7 +173,7 @@
             
             this.suiviPaiements = data.map(track => ({
             ...track,
-            nom: track.infoc?.nom || '',
+            nom: track.mgj_infoc?.nom || '',
             
             descriptif: this.CapitalizeFirstLetter(track.descriptif) + ' ' + this.CapitalizeFirstLetter(track.payment?.mois || '') + ' ' + (track.payment?.annee || ''),
             annee: track.payment?.annee || '',
@@ -202,8 +202,8 @@
         }
         try {
             const query = supabase
-            .from('pay_track')
-            .select('id, time, montant, ele_id,descriptif, infoc!ele_id(nom),payment!id_pay(mois,annee),users!user(name_user)')
+            .from('mjg_pay_track')
+            .select('id, time, montant, ele_id,descriptif, mgj_infoc!ele_id(nom),mjg_payment!id_pay(mois,annee),users!user(name_user)')
             .order('time', { ascending: false })
             .order('id', { ascending: false })
             .limit(100);
@@ -217,7 +217,7 @@
 
             this.suiviPaiements = data.map(track => ({
             ...track,
-            nom: track.infoc?.nom || '',
+            nom: track.mgj_infoc?.nom || '',
             
             descriptif: this.CapitalizeFirstLetter(track.descriptif) + ' ' + this.CapitalizeFirstLetter(track.payment?.mois || '') + ' ' + (track.payment?.annee || ''),
             annee: track.payment?.annee || '',
@@ -244,7 +244,7 @@
             };
 
             const { error } = await supabase
-            .from('payment')
+            .from('mjg_payment')
             .update(cleanedData)
             .eq('id', this.initialValues.id);
 
@@ -257,7 +257,7 @@
         }
         },
         subscribeToTable() {
-        this.realtimeStore.subscribeToTable('payment', 'suiviPaiements', this);
+        this.realtimeStore.subscribeToTable('mjg_payment', 'suiviPaiements', this);
         },
         exportToExcel() {
         const worksheetData = this.suiviPaiements.map(item => {
@@ -279,7 +279,7 @@
         await this.debouncedGetSuiviPaiements();
     },
     beforeUnmount() {
-        this.realtimeStore.unsubscribeFromTable('payment', 'suiviPaiements');
+        this.realtimeStore.unsubscribeFromTable('mjg_payment', 'suiviPaiements');
     },
     };
     </script>

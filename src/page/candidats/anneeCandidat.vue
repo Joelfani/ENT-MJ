@@ -6,7 +6,7 @@
 
         <TableComponent :columns="columns" :rows="anneeCan">
             <template #actions="{ item }">
-                <TableAction :id="item.id" title="l'année de concours" table-suppr="promc" tableEdit="promc" @mod_data="dataInitialFormMod">
+                <TableAction :id="item.id" title="l'année de concours" table-suppr="mjg_promc" tableEdit="mjg_promc" @mod_data="dataInitialFormMod">
                     <template #form_modifier>
                         <FormComponent :inputs="input_mod" label_button="Modifier" @submit="mod_annee_concours"/>
                     </template>
@@ -79,7 +79,7 @@ export default {
         //fonction pour gerer les annees de concours
         async get_annees_concours() {
             const {data} = await supabase
-                .from('promc')
+                .from('mjg_promc')
                 .select('*')
                 .order('id', { ascending: false });
             this.anneeCan = data || [];
@@ -88,7 +88,7 @@ export default {
         // Méthode pour ajouter une année de concours
         async add_annee_concours(data) {
             const doubleData = await supabase
-                .from('promc')
+                .from('mjg_promc')
                 .select('*')
                 .eq('annee', data.annee);
             if (doubleData.data.length > 0) {
@@ -104,7 +104,7 @@ export default {
             else{
                 try {
                     const { error } = await supabase
-                        .from('promc')
+                        .from('mjg_promc')
                         .insert([
                             { annee: data.annee }
                         ]);
@@ -132,7 +132,7 @@ export default {
         async mod_annee_concours(data) {
             // Vérifier si l'année existe déjà
             const doubleData = await supabase
-                .from('promc')
+                .from('mjg_promc')
                 .select('*')
                 .eq('annee', data.annee)
                 .neq('id', data.id); // Exclure l'ID actuel pour éviter les doublons
@@ -147,7 +147,7 @@ export default {
                 // Mise à jour de l'année de concours
                 try {
                     const { error } = await supabase
-                        .from('promc')
+                        .from('mjg_promc')
                         .update({ annee: data.annee })
                         .eq('id', data.id);
 
@@ -165,7 +165,7 @@ export default {
 
         // Méthode pour souscrire aux changements en temps réel
         subscribeToPromotions() {
-            this.realtimeStore.subscribeToTable('promc','anneeCan',this)
+            this.realtimeStore.subscribeToTable('mjg_promc','anneeCan',this)
         },
 
     },
@@ -175,7 +175,7 @@ export default {
     },
     beforeUnmount() {
     // Nettoyer la souscription
-    this.realtimeStore.unsubscribeFromTable('promc');
+    this.realtimeStore.unsubscribeFromTable('mjg_promc');
 },
 };
 </script>

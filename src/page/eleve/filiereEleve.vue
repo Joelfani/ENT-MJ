@@ -157,7 +157,7 @@ export default {
 
     beforeUnmount() {
     // Nettoyer la souscription
-    this.realtimeStore.unsubscribeFromTable('promotion');
+    this.realtimeStore.unsubscribeFromTable('mjg_promotion');
 },
 };
 </script>

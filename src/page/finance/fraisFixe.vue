@@ -171,14 +171,14 @@
         async ecoData() {
         try {
             const { data: eleves, error: elevesError } = await supabase
-            .from('infoc')
+            .from('mgj_infoc')
             .select('*')
             .eq('prom_ele', this.selectPromStore.promotion_selected)
             .order('rang', { ascending: false });
             if (elevesError) throw elevesError;
 
             const { data: paiements, error: paiementsError } = await supabase
-            .from('payment')
+            .from('mjg_payment')
             .select('*')
             .order('id', { ascending: false });
             if (paiementsError) throw paiementsError;
@@ -228,7 +228,7 @@
         }
         try {
             const query = supabase
-            .from('infoc')
+            .from('mgj_infoc')
             .select('*')
             .eq('prom_ele', this.selectPromStore.promotion_selected)
             .order('rang', { ascending: false });
@@ -256,7 +256,7 @@
         this.idMod = id;
         try {
             const { data, error } = await supabase
-            .from('payment')
+            .from('mjg_payment')
             .select('*')
             .eq('ele_id', id)
             .eq('categorie', ctg)
@@ -278,13 +278,13 @@
         if (this.idPay) {
             try {
             const { error } = await supabase
-                .from('payment')
+                .from('mjg_payment')
                 .update({ montant: this.montant == '' ? null : this.montant})
                 .eq('id', this.idPay);
             if (error) throw error;
             try {
                 const {error} = await supabase
-                .from('pay_track')
+                .from('mjg_pay_track')
                 .insert({
                     id_pay: this.idPay,
                     ele_id: this.idMod,
@@ -306,7 +306,7 @@
         else {
             try {
                 const { data, error } = await supabase
-                .from('payment')
+                .from('mjg_payment')
                 .insert({
                     ele_id: this.idMod,
                     categorie: this.ctg,
@@ -322,7 +322,7 @@
                 this.idPay = data.id;
 
                 await supabase
-                .from('pay_track')
+                .from('mjg_pay_track')
                 .insert({
                     id_pay: this.idPay,
                     ele_id: this.idMod,
@@ -341,7 +341,7 @@
         }
         },
         subscribeToTable() {
-        this.realtimeStore.subscribeToTable('payment', 'paiements', this);
+        this.realtimeStore.subscribeToTable('mjg_payment', 'paiements', this);
         },
         exportToExcel() {
         const worksheetData = this.filteredRows.map(item => {
@@ -365,7 +365,7 @@
         await this.debouncedecoData();
     },
     beforeUnmount() {
-        this.realtimeStore.unsubscribeFromTable('payment', 'paiements');
+        this.realtimeStore.unsubscribeFromTable('mjg_payment', 'paiements');
     },
     };
     </script>

@@ -18,7 +18,7 @@
         
         <TableComponent :columns="label_but_dev_tab === 'Développer' ? columns2 : columns" :rows="postFormations">
             <template #actions="{ item }">
-                <TableAction :id="item.id" title="la post-formation" :view_but_del="false" :notSuppr="true" tableEdit="infoc" @mod_data="dataInitialFormMod">
+                <TableAction :id="item.id" title="la post-formation" :view_but_del="false" :notSuppr="true" tableEdit="mgj_infoc" @mod_data="dataInitialFormMod">
                     <template #form_modifier>
                         <FormComponent :inputs="input_mod" label_button="Modifier" @submit="modPostFormation"/>
                     </template>
@@ -176,7 +176,7 @@ export default {
             
             try {
                 const { data, error } = await supabase
-                    .from('infoc')
+                    .from('mgj_infoc')
                     .select('id, rang, nom, filiere, statut_post, duree_rech, secteur_emploi, nom_entreprise, situation, type_entreprise, formalisation, type_contrat, niv_salaire')
                     .eq('prom_ele', this.selectPromStore.promotion_selected)
                     .order('rang', { ascending: false });
@@ -200,7 +200,7 @@ export default {
             }
             try {
                 const query = supabase
-                    .from('infoc')
+                    .from('mgj_infoc')
                     .select('id, rang, nom, filiere, statut_post, duree_rech, secteur_emploi, nom_entreprise, situation, type_entreprise, formalisation, type_contrat, niv_salaire')
                     .eq('prom_ele', this.selectPromStore.promotion_selected)
                     .order('id', { ascending: false });
@@ -227,7 +227,7 @@ export default {
         async getFiliere() {
             try {
                 const { data, error } = await supabase
-                    .from('filiere')
+                    .from('mjg_filiere')
                     .select('*')
                     .order('id', { ascending: true });
                 if (error) throw error;
@@ -250,7 +250,7 @@ export default {
                 }
 
                 const { error } = await supabase
-                    .from('infoc')
+                    .from('mgj_infoc')
                     .update(cleanedData)
                     .eq('id', this.initialValues.id);
 
@@ -263,7 +263,7 @@ export default {
             }
         },
         subscribeToTable() {
-            this.realtimeStore.subscribeToTable('infoc', 'postFormations', this);
+            this.realtimeStore.subscribeToTable('mgj_infoc', 'postFormations', this);
         },
         exportToExcel() {
             const worksheetData = this.postFormations.map(item => {
@@ -286,7 +286,7 @@ export default {
         this.debouncedGetPostFormations();
     },
     beforeUnmount() {
-        this.realtimeStore.unsubscribeFromTable('infoc', 'postFormations');
+        this.realtimeStore.unsubscribeFromTable('mgj_infoc', 'postFormations');
     },
 };
 </script>
