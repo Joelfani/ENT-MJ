@@ -84,6 +84,10 @@ export default {
                     { key: 'age', label: "Âge", style: 'min-width: 100px' },
                     { key: 'tel', label: "Téléphone", style: 'min-width: 150px' },
                     { key: 'adresse', label: "Adresse", style: 'min-width: 200px' },
+                    { key: 'region', label: "Région d'origine", style: 'min-width: 200px' },
+                    { key: 'contexte_hab', label: "Contexte d'habitation", style: 'min-width: 200px' },
+                    { key: 'nbr_pers_foyer', label: "Nombre de personnes à charge dans le foyer", style: 'min-width: 350px' },
+                    { key: 'situ_parent', label: "Situation des parents", style: 'min-width: 200px' },
                     { key: 'niveau', label: "Dernière classe suivie", style: 'min-width: 200px' },
                     { key: 'diplome', label: "Dernier diplôme obtenu", style: 'min-width: 200px' },
                     { key: 'etab', label: "Dernier établissement", style: 'min-width: 250px' },
@@ -150,6 +154,10 @@ export default {
                 { id: 'lieu', type: 'text', label: "Lieu de naissance", placeholder: "Entrez le lieu de naissance", initialValue: this.add_initialValue.lieu, required: false },
                 { id: 'tel', type: 'text', label: "Téléphone", placeholder: "Entrez le numéro de téléphone", initialValue: this.add_initialValue.tel, required: false },
                 { id: 'adresse', type: 'text', label: "Adresse", placeholder: "Entrez l'adresse", initialValue: this.add_initialValue.adresse, required: false },
+                { id: 'region', type: 'text', label: "Région d'origine", placeholder: "Entrez la région d'origine", initialValue: this.add_initialValue.region, required: false },
+                { id: 'contexte_hab', type: 'text', label: "Contexte d'habitation", placeholder: "Entrez le contexte d'habitation", initialValue: this.add_initialValue.contexte_hab, required: false },
+                { id: 'nbr_pers_foyer', type: 'number', label: "Nombre de personnes à charge dans le foyer", placeholder: "Entrez le nombre de personnes à charge dans le foyer", initialValue: this.add_initialValue.nbr_pers_foyer, required: false },
+                { id: 'situ_parent', type: 'text', label: "Situation des parents", placeholder: "Entrez la situation des parents", initialValue: this.add_initialValue.situ_parent, required: false },
                 { id: 'niveau', type: 'select', label: "Dernière classe suivie", placeholder: "Entrez la dernière classe suivie", initialValue: this.add_initialValue.niveau,
                 options: [
                     { value: '6ème', text: '6ème' },
@@ -219,6 +227,10 @@ export default {
         { id: 'lieu', type: 'text', label: "Lieu de naissance", placeholder: "Entrez le lieu de naissance", initialValue: this.initialValues.lieu, required: false },
         { id: 'tel', type: 'text', label: "Téléphone", placeholder: "Entrez le numéro de téléphone", initialValue: this.initialValues.tel, required: false },
         { id: 'adresse', type: 'text', label: "Adresse", placeholder: "Entrez l'adresse", initialValue: this.initialValues.adresse, required: false },
+        { id: 'region', type: 'text', label: "Région d'origine", placeholder: "Entrez la région d'origine", initialValue: this.initialValues.region, required: false },
+        { id: 'contexte_hab', type: 'text', label: "Contexte d'habitation", placeholder: "Entrez le contexte d'habitation", initialValue: this.initialValues.contexte_hab, required: false },
+        { id: 'nbr_pers_foyer', type: 'number', label: "Nombre de personnes à charge dans le foyer", placeholder: "Entrez le nombre de personnes à charge dans le foyer", initialValue: this.initialValues.nbr_pers_foyer, required: false },
+        { id: 'situ_parent', type: 'text', label: "Situation des parents", placeholder: "Entrez la situation des parents", initialValue: this.initialValues.situ_parent, required: false },
         { id: 'niveau', type: 'select', label: "Dernière classe suivie", placeholder: "Entrez la dernière classe suivie", initialValue: this.initialValues.niveau,
             options: [
                 { value: '6ème', text: '6ème' },
@@ -370,6 +382,10 @@ export default {
                 naiss: '',
                 tel: '',
                 adresse: '',
+                region: '',
+                contexte_hab: '',
+                nbr_pers_foyer: 0,
+                situ_parent: '',
                 age: '',
                 lieu: '',
                 niveau: '6ème',
@@ -417,6 +433,7 @@ export default {
                     this.add_initialValue = this.getInitialForm();
                 } catch (error) {
                     console.error('Erreur lors de l\'ajout du candidat:', error);
+                    alert('Erreur lors de l\'ajout du candidat.');
                 }
             }
         },

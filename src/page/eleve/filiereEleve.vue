@@ -74,7 +74,7 @@ export default {
         async getFilieres() {
             try {
                 const { data, error } = await supabase
-                .from('filiere')
+                .from('mjg_filiere')
                 .select('*')
                 .order('id', { ascending: false });
                 if (error) throw error;
@@ -90,7 +90,7 @@ export default {
         },
         async addFiliere(data) {
             const doubleData = await supabase
-                .from('filiere')
+                .from('mjg_filiere')
                 .select('*')
                 .or(`nom.eq.${data.nom},nomlong.eq.${data.nomlong}`)
             if (doubleData.data.length > 0) {
@@ -119,7 +119,7 @@ export default {
         },
         async modFiliere(data) {
             const doubleData = await supabase
-                .from('filiere')
+                .from('mjg_filiere')
                 .select('*')
                 .or(`nom.eq.${data.nom},nomlong.eq.${data.nomlong}`)
                 .neq('id', this.initialValues.id);
@@ -129,7 +129,7 @@ export default {
             }else{
                 try {
                     const { error } = await supabase
-                        .from('filiere')
+                        .from('mjg_filiere')
                         .update(data)
                         .eq('id', this.initialValues.id);
                         alert('Filière modifiée avec succès !');
@@ -147,7 +147,7 @@ export default {
 
         // Méthode pour souscrire aux changements en temps réel
         subscribeToTable() {
-            this.realtimeStore.subscribeToTable('filiere','filieres',this)
+            this.realtimeStore.subscribeToTable('mjg_filiere','filieres',this)
         },
     },
     async mounted() {

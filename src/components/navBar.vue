@@ -372,7 +372,7 @@ export default{
         async getAnnees() {
             try {
                 const { data } = await supabase
-                .from('promc')
+                .from('mjg_promc')
                 .select('*')
                 .order('id', { ascending: false });
 

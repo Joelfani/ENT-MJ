@@ -69,11 +69,16 @@ export default {
             ],
             notes: [],
             noteColumns: [
-                { key: 'nom', label: 'Nom et Prénom', style: 'min-width: 250px' },
+                { key: 'nom', label: 'Nom et Prénom', style: 'min-width: 250px', etat: true},
                 { key: 'filiere', label: 'Filière', style: 'min-width: 150px' },
-                { key: 'ecrit', label: 'Ecrit', style: 'min-width: 100px' },
+                { key: 'physique', label: 'Physique', style: 'min-width: 100px' },
+                { key: 'francais', label: 'Français', style: 'min-width: 100px' },
+                { key: 'anglais', label: 'Anglais', style: 'min-width: 100px' },
+                { key: 'culg', label: 'Culture général', style: 'min-width: 200px' },
+                { key: 'entretien', label: 'Entretien', style: 'min-width: 100px' },
                 { key: 'motivation', label: 'Motivation', style: 'min-width: 150px' },
                 { key: 'apreciation', label: 'Apréciation', style: 'min-width: 150px' },
+                { key: 'com_note', label: 'Commentaire', style: 'min-width: 200px' },
                 { key: 'situ', label: 'Situation', style: 'min-width: 150px' },
             ],
             initialValues: {},
@@ -98,9 +103,14 @@ export default {
         input_mod() {
             return [
                 { id: 'id', type: 'hidden', initialValue: this.initialValues.id },
-                { id: 'ecrit', type: 'number', label: 'Ecrit:',step:0.01, initialValue: this.initialValues.ecrit},
-                { id: 'motivation', type: 'number', label: 'Motivation:',step:0.01, initialValue: this.initialValues.motivation },
+                { id: 'physique', type: 'number', label: 'Physique:',step:0.01, initialValue: this.initialValues.physique ? this.initialValues.physique : 0 },
+                { id: 'francais', type: 'number', label: 'Français:',step:0.01, initialValue: this.initialValues.francais ? this.initialValues.francais : 0 },
+                { id: 'anglais', type: 'number', label: 'Anglais:',step:0.01, initialValue: this.initialValues.anglais ? this.initialValues.anglais : 0 },
+                { id: 'culg', type: 'number', label: 'Culture général:',step:0.01, initialValue: this.initialValues.culg ? this.initialValues.culg : 0 },
+                { id: 'entretien', type: 'text', label: 'Entretien:',step:0.01, initialValue: this.initialValues.entretien ? this.initialValues.entretien : ''},
+                { id: 'motivation', type: 'number', label: 'Motivation:',step:0.01, initialValue: this.initialValues.motivation ? this.initialValues.motivation : 0 },
                 { id: 'apreciation', type: 'text', label: 'Apréciation', initialValue: this.initialValues.apreciation },
+                { id: 'com_note', type: 'textarea', label: 'Commentaire', initialValue: this.initialValues.com_note },
                 { id: 'situ', type: 'select', label: "Situation:", initialValue: this.initialValues.situ,
                     options: [
                         { value: 'validée', text: 'validée' },
@@ -135,6 +145,8 @@ export default {
                 
                 this.notes = data;
                 this.isLoading = false;
+                console.log('note :', data);
+                
             } catch (error) {
                 console.error('Erreur lors de la récupération des notes:', error);
                 this.notes = [];
@@ -247,16 +259,23 @@ export default {
         },
         async modNote(data) {
                 try {
+                    // Nettoyage : convertir les champs vides en null ou nombre
+                    Object.keys(data).forEach(key => {
+                        if (data[key] === "" || data[key] === undefined) {
+                            data[key] = null;
+                        }
+                    });
                     const { error } = await supabase
                         .from('mgj_infoc')
                         .update(data)
                         .eq('id', this.initialValues.id);
-                    alert('Note modifiée avec succès !');
                     if (error) {
                         throw error;
                     }
+                    alert('Note modifiée avec succès !');
                 } catch (error) {
                     console.error('Erreur lors de la modification de la note:', error);
+                    alert('Erreur lors de la modification de la note.');
                 }
         },
         subscribeToTable() {
