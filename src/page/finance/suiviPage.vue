@@ -175,8 +175,8 @@
             ...track,
             nom: track.mgj_infoc?.nom || '',
             
-            descriptif: this.CapitalizeFirstLetter(track.descriptif) + ' ' + this.CapitalizeFirstLetter(track.payment?.mois || '') + ' ' + (track.payment?.annee || ''),
-            annee: track.payment?.annee || '',
+            descriptif: this.CapitalizeFirstLetter(track.descriptif) + ' ' + this.CapitalizeFirstLetter(track.mjg_payment?.mois || '') + ' ' + (track.mjg_payment?.annee || ''),
+            annee: track.mjg_payment?.annee || '',
             nom_user: track.users?.name_user || '',
             }));
             
