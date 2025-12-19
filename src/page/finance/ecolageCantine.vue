@@ -268,7 +268,7 @@ export default {
                     if (error) throw error;
                     try {
                         const {error} = await supabase
-                        .from('pay_track')
+                        .from('mjg_pay_track')
                         .insert({
                             id_pay: this.idPay,
                             ele_id: this.idMod,
@@ -301,7 +301,7 @@ export default {
                     if (error) throw error;
                     this.idPay = data.id;
                     await supabase
-                        .from('pay_track')
+                        .from('mjg_pay_track')
                         .insert({
                             id_pay: this.idPay,
                             ele_id: this.idMod,
