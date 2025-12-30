@@ -63,7 +63,7 @@
                                     data-toggle="modal"
                                     :data-target="userStore[subItem.acces] ? '#'+subItem.modal : '#UNACCESS'"
                                     :title="subItem.title"
-                                    @click="changeClass(subItem.view)">
+                                    @click="recoveryLastUpdate(subItem.view,subItem.maj ? subItem.maj : 'none')">
                                     <div :class="`sub_box centre ${subItem.icon || menu.icon}`"></div>
                                     {{ subItem.title}}
                                 </a>
@@ -92,14 +92,15 @@
                 v-if="subItem.modal"
                 :id="subItem.modal"
                 :title="subItem.modal_title"
+                :mini_title="last_update ? 'Dernière mise à jour : ' + last_update : null"
                 >
                 <div>
                     <label for="">Selection de la promotion</label>
                     <div class="select-promotion">
-                        <select v-if="menu.title != 'Candidats'" class="form-control" name="prom" v-model="selected_prom">
+                        <select v-if="menu.title != 'Candidats' && subItem.title != 'Candidats'" class="form-control" name="prom" v-model="selected_prom">
                             <option v-for="prom in promotions" :key="prom.id" :value="prom.id">{{ prom.name }}</option>
                         </select>
-                        <select v-if="menu.title == 'Candidats'" class="form-control" name="annee" v-model="selected_annee">
+                        <select v-if="menu.title == 'Candidats' || subItem.title == 'Candidats'" class="form-control" name="annee" v-model="selected_annee">
                             <option v-for="annee in annees" :key="annee.id" :value="annee.id">{{ annee.annee }}</option>
                         </select>
                         <RouterLink
@@ -153,7 +154,9 @@ export default{
                             modal_title: 'TABLEAU DE BORD POUR LES FINANCES',
                             title_view: 'TABLEAU DE BORD POUR LES FINANCES',
                             view: 'tdb_fin',
-                            icon: 'icon-finance'
+                            maj:'mjg_payment',
+                            icon: 'icon-finance',
+                            acces:'fin'
                             },
                             {
                             title: 'Eleves',
@@ -161,7 +164,9 @@ export default{
                             modal_title: 'TABLEAU DE BORD POUR LES ELEVES',
                             title_view: 'TABLEAU DE BORD POUR LES ELEVES',
                             view: 'tdb_ele',
-                            icon: 'icon-eleve'
+                            maj:'mgj_infoc',
+                            icon: 'icon-eleve',
+                            acces:'ele'
                             },
                             {
                             title: 'Candidats',
@@ -169,7 +174,9 @@ export default{
                             modal_title: 'TABLEAU DE BORD POUR LES CANDIDATS',
                             title_view: 'TABLEAU DE BORD POUR LES CANDIDATS',
                             view: 'tdb_can',
-                            icon: 'icon-candidat'
+                            maj:'mgj_infoc',
+                            icon: 'icon-candidat',
+                            acces:'can'
                             },
                         ],
                 },
@@ -323,6 +330,7 @@ export default{
             selected_prom: null,
             selected_annee: null,
             promotions: [],
+            last_update: null,
         }
     },
     computed: {
@@ -380,6 +388,40 @@ export default{
             } catch (error) {
                 console.error('Erreur lors de la récupération des années:', error);
                 this.annees = [];
+            }
+        },
+        async recoveryLastUpdate(view, maj) {
+            try {
+                this.last_update = null
+                await this.changeClass(view)
+                if(maj === 'none'){
+                    return;
+                }
+                const { data, error } = await supabase
+                    .from('suivi_mouv_ent')
+                    .select('last_update')
+                    .order('id', { ascending: true })
+                    .eq('table_name', maj)
+                    .limit(1);
+
+                if (error) {
+                    console.error('Erreur lors de la récupération de la dernière mise à jour :', error);
+                    return;
+                }
+                
+                const isoDate = data[0].last_update
+
+                const date = new Date(isoDate)
+
+                const formattedDate = date.toLocaleDateString("fr-FR", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric"
+                })
+                this.last_update = formattedDate
+                
+            } catch (error) {
+                console.error('Erreur lors de la récupération de la dernière mise à jour :', error);
             }
         },
     },
